@@ -6,9 +6,19 @@
 		<artifactId>e3-manager</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+	<packaging>war</packaging>
 	<artifactId>e3-manager-service</artifactId>
 	<dependencies>
-
+		<dependency>
+			<groupId>e3mall</groupId>
+			<artifactId>e3-manager-dao</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>e3mall</groupId>
+			<artifactId>e3-manager-interface</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -39,15 +49,29 @@
 			<artifactId>spring-context-support</artifactId>
 		</dependency>
 
+
+		<!-- dubbo相关 -->
 		<dependency>
-			<groupId>e3mall</groupId>
-			<artifactId>e3-manager-dao</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dubbo</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.netty</groupId>
+					<artifactId>netty</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>e3mall</groupId>
-			<artifactId>e3-manager-interface</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.sgroschupf</groupId>
+			<artifactId>zkclient</artifactId>
 		</dependency>
 	</dependencies>
 </project>
