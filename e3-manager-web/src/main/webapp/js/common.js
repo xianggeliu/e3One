@@ -79,7 +79,7 @@ var E3 = {
         				_ele.siblings(".pics").find("ul").append("<li><a href='"+imgs[i]+"' target='_blank'><img src='"+imgs[i]+"' width='80' height='50' /></a></li>");
         			}
         		}
-        	}
+        	} 
         	//给“上传图片按钮”绑定click事件
         	$(e).click(function(){
         		var form = $(this).parentsUntil("form").parent("form");
