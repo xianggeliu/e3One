@@ -1,4 +1,4 @@
-package cn.e3mall.controller;
+package cn.e3mall.controller.item;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;

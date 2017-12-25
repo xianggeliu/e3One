@@ -1,4 +1,4 @@
-package cn.e3mall.controller;
+package cn.e3mall.controller.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

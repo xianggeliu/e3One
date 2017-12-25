@@ -1,4 +1,4 @@
-package cn.e3mall.controller;
+package cn.e3mall.controller.item;
 
 import java.util.HashMap;
 import java.util.Map;
