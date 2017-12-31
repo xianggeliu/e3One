@@ -18,5 +18,7 @@ public interface ContentService {
 	public void deleteContentById(long[] ids);
 
 	public void updateContent(TbContent tbContent);
+
+	public List<TbContent> getContentListByCategoryId(long ad1);
 	
 }

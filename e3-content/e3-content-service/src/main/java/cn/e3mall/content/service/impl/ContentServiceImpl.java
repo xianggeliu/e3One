@@ -3,14 +3,17 @@ package cn.e3mall.content.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import cn.e3mall.common.jedis.JedisClient;
 import cn.e3mall.common.pojo.E3Result;
 import cn.e3mall.common.pojo.ResultPage;
+import cn.e3mall.common.utils.JsonUtils;
 import cn.e3mall.content.service.ContentService;
 import cn.e3mall.mapper.TbContentMapper;
 import cn.e3mall.pojo.TbContent;
@@ -21,6 +24,8 @@ import cn.e3mall.pojo.TbContentExample.Criteria;
 public class ContentServiceImpl implements ContentService {
 	@Autowired
 	private TbContentMapper tbContentMapper;
+	@Autowired
+	private JedisClient jedisClient;
 
 	/**
 	 * 根据categoryId 查询所有的相关content数据
@@ -48,6 +53,8 @@ public class ContentServiceImpl implements ContentService {
 	 */
 	@Override
 	public E3Result saveTbContent(TbContent tbContent) {
+		// 做添加动作的时候先删除redis中的缓存数据
+		jedisClient.hdel("content-info", tbContent.getCategoryId() + "");
 		// 1）补全pojo对象的属性
 		Date date = new Date();
 		tbContent.setCreated(date);
@@ -73,6 +80,10 @@ public class ContentServiceImpl implements ContentService {
 	@Override
 	public void deleteContentById(long[] ids) {
 		for (long id : ids) {
+			//需要先查找到Content
+			TbContent tbContent = tbContentMapper.selectByPrimaryKey(id);
+			// 做添加动作的时候先删除redis中的缓存数据
+			jedisClient.hdel("content-info", tbContent.getCategoryId() + "");
 			tbContentMapper.deleteByPrimaryKey(id);
 
 		}
@@ -84,8 +95,39 @@ public class ContentServiceImpl implements ContentService {
 	 */
 	@Override
 	public void updateContent(TbContent tbContent) {
+		// 做修改动作的时候先删除redis中的缓存数据
+		jedisClient.hdel("content-info", tbContent.getCategoryId() + "");
 		tbContent.setUpdated(new Date());
 		tbContentMapper.updateByPrimaryKeySelective(tbContent);
+	}
+
+	@Override
+	public List<TbContent> getContentListByCategoryId(long ad1) {
+		try {
+			String hget = jedisClient.hget("content-info", ad1 + "");
+			// 先查询redis里没有缓存
+			if (StringUtils.isNotBlank(hget)) {
+				List<TbContent> contents = JsonUtils.jsonToList(hget, TbContent.class);
+				return contents;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		TbContentExample example = new TbContentExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andCategoryIdEqualTo(ad1);
+		// 1）根据cid查询内容列表
+		List<TbContent> list = tbContentMapper.selectByExampleWithBLOBs(example);
+		try {
+			String json = JsonUtils.objectToJson(list);
+			// 把数据存到缓存中
+			jedisClient.hset("content-info", ad1 + "", json);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// 2）返回结果
+		return list;
 	}
 
 }
